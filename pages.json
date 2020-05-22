@@ -1,0 +1,73 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "发现",
+				"app-plus":{
+					"titleNView": false  // 去掉标题栏title
+				}
+			}
+		},
+		{
+			"path": "pages/video/index",
+			"style": {
+				"navigationBarTitleText": "视频" // 状态栏标题，覆盖掉 globalStyle 中设置的标题
+			}
+		}, {
+			"path": "pages/mine/index",
+			"style": {
+				"navigationBarTitleText": "我的" // 状态栏标题，覆盖掉 globalStyle 中设置的标题
+			}
+		}, {
+			"path": "pages/cloud/index",
+			"style": {
+				"navigationBarTitleText": "云村" // 状态栏标题，覆盖掉 globalStyle 中设置的标题
+			}
+		}, {
+			"path": "pages/account/index",
+			"style": {
+				"navigationBarTitleText": "账号" // 状态栏标题，覆盖掉 globalStyle 中设置的标题
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black", // 导航栏标题颜色以及状态栏前景颜色，仅支持black/white
+		"navigationBarTitleText": "网易云音乐", // 导航栏标题文字内容
+		"navigationBarBackgroundColor": "#F8F8F8", // 导航栏背景颜色（同状态栏背景色）
+		"backgroundColor": "#F8F8F8", // 窗口的背景色
+		"navigationStyle": "custom"
+	},
+	"tabBar": {
+		"color": "#888",
+		"selectedColor": "#ff2419",
+		"borderStyle": "white",
+		"backgroundColor": "#f9f9f9",
+		"list": [{
+			"pagePath": "pages/index/index",
+			"iconPath": "static/tab/t_1.png",
+			"selectedIconPath": "static/tab/t_11.png",
+			"text": "发现"
+		}, {
+			"pagePath": "pages/video/index",
+			"iconPath": "static/tab/t_2.png",
+			"selectedIconPath": "static/tab/t_21.png",
+			"text": "视频"
+		}, {
+			"pagePath": "pages/mine/index",
+			"iconPath": "static/tab/t_3.png",
+			"selectedIconPath": "static/tab/t_31.png",
+			"text": "我的"
+		}, {
+			"pagePath": "pages/cloud/index",
+			"iconPath": "static/tab/t_4.png",
+			"selectedIconPath": "static/tab/t_41.png",
+			"text": "云村"
+		}, {
+			"pagePath": "pages/account/index",
+			"iconPath": "static/tab/t_5.png",
+			"selectedIconPath": "static/tab/t_51.png",
+			"text": "账号"
+		}]
+	}
+}
