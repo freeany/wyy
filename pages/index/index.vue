@@ -1,145 +1,272 @@
 <template>
 	<view>
-		<!-- banner轮播图 -->
-		<view class="banner">
-			<swiper class="swiper" :autoplay="true" :indicator-dots="true" indicator-active-color="#ff372b" indicator-color="rgba(255,255,255, .5)" duration="500" :circular="true">
-				<swiper-item v-for="(item, index) in swiper" :key="index">
-					<view class="item">
-						<image :src="item.imageUrl + $imgSuffix" class="img"></image>
-						<view class="tag">{{ item.typeTitle }}</view>
+		<view :class="{dpn: isShowSearch}">
+			<uni-nav-bar fixed :status-bar="true" @clickLeft="goCloud" @clickRight="goCloud">
+				<block slot="left"><image class="top-img" src="/static/image/search/6.png"></image></block>
+				<view class="top-search flex-box" @click="openSearch">
+					<image class="search-icon" src="/static/image/search/2.png"></image>
+					{{ searchTxt }}
+				</view>
+				<!-- #ifdef APP-PLUS || H5 -->
+				<block slot="right"><image class="top-img" src="/static/image/mine/r.png"></image></block>
+				<!-- #endif -->
+			</uni-nav-bar>
+			<view class="page-content">
+				<mescroll-uni ref="mescroll" :fixed="false" :down="downOption" :up="upOption" @down="downCallback" @up="upCallback">
+					<view class="banner">
+						<swiper
+							class="swiper"
+							:autoplay="true"
+							:indicator-dots="true"
+							indicator-active-color="#ff372b"
+							indicator-color="rgba(255,255,255, .5)"
+							duration="400"
+							:circular="true"
+						>
+							<swiper-item v-for="(item, index) in swiper" :key="index">
+								<view class="item">
+									<image :src="item.imageUrl + $imgSuffix" class="img"></image>
+									<view class="tag">{{ item.typeTitle }}</view>
+								</view>
+							</swiper-item>
+						</swiper>
 					</view>
-				</swiper-item>
-			</swiper>
-		</view>
-		<!-- 主入口 -->
-		<view class="main-bar flex-box">
-			<view class="flex-item" v-for="(item, index) in contentBar" :key="index">
-				<image :src="'/static/image/index/t_' + (index + 1) + '.png'" class="img"></image>
-				<view>{{ item.name }}</view>
-				<view v-if="index == 0" class="date">{{ curDate }}</view>
+					<!-- 主入口 -->
+					<view class="main-bar flex-box">
+						<view class="flex-item" v-for="(item, index) in contentBar" :key="index">
+							<image :src="'/static/image/index/t_' + (index + 1) + '.png'" class="img"></image>
+							<view>{{ item.name }}</view>
+							<view v-if="index == 0" class="date">{{ curDate }}</view>
+						</view>
+					</view>
+					<!-- 歌单分类块 -->
+					<songList title="推荐歌单" link="/pages/songSquare/index?limit=30" :list="recommendSongs" />
+					<!-- 歌单分类块 -->
+					<view class="song-list">
+						<view class="tit-bar">
+							推荐歌单
+							<view class="more fr">歌单广场</view>
+						</view>
+						<scroll-view class="scroll-view" scroll-x>
+							<view class="item" v-for="(item, index) in recommendSongs" :key="index">
+								<image class="img" :src="item.picUrl + $imgSuffix"></image>
+								<view class="desc ellipsis">{{ item.name }}</view>
+								<view class="count">{{ item.playCount }}</view>
+							</view>
+						</scroll-view>
+					</view>
+					<!-- 歌单分类块 -->
+					<view class="song-list">
+						<view class="switch-line flex-box">
+							<view class="flex-box">
+								<view class="switch-item" :class="{ on: newType == 1 }" @click="switchTab(1)">新碟</view>
+								|
+								<view class="switch-item" :class="{ on: newType == 2 }" @click="switchTab(2)">新歌</view>
+							</view>
+							<template v-if="newType == 1">
+								<view class="more">更多新碟</view>
+							</template>
+							<template v-if="newType == 2">
+								<view class="more">新歌推荐</view>
+							</template>
+						</view>
+						<scroll-view class="scroll-view" scroll-x>
+							<view class="item" v-for="(item, index) in latestAlbum" :key="index">
+								<image class="img" :src="item.picUrl + $imgSuffix"></image>
+								<view class="desc ellipsis">{{ item.name }}</view>
+								<view class="desc ellipsis c9">{{ item.artist.name }}</view>
+							</view>
+						</scroll-view>
+					</view>
+					<!-- 歌单分类块 -->
+					<view class="video-list song-list">
+						<view class="tit-bar">
+							精选视频
+							<view class="more fr">更多></view>
+						</view>
+						<view class="video-item" v-for="(item, index) in relatedVideo" :key="index">
+							<image class="img" :src="item.coverUrl + $imgSuffix"></image>
+							<view class="desc ellipsis">{{ item.title }}</view>
+						</view>
+					</view>
+				</mescroll-uni>
 			</view>
 		</view>
-		<!-- 歌单分类块 y-->
-		<song-list title="推荐歌单" link="/pages/songSquare/index?limit=30" :list="recommendSongs" />
-		<!-- 歌单分类块 x轴可滚动-->
-		<song-list title="推荐歌单-x" link="/pages/songSquare/index?limit=30" :list="recommendSongs" scrollX/>
-		
-		<!-- 歌单分类块 -->
-		<view class="song-list">
-			<view class="switch-line flex-box">
-				<view class="flex-box">
-					<view class="switch-item" :class="{on : newType == 1}" @click="switchTab(1)">新碟</view>|
-					<view class="switch-item" :class="{on : newType == 2}" @click="switchTab(2)">新歌</view>
-				</view>
-				<template v-if="newType == 1">
-					<view class="more">更多新碟</view>
-				</template>
-				<template v-if="newType == 2">
-					<view class="more">新歌推荐</view>
-				</template>
-			</view>
-			<scroll-view class="scroll-view" scroll-x>
-				<view class="item" v-for="(item, index) in latestAlbum" :key="index">
-					<image class="img" :src="item.picUrl + $imgSuffix"></image>
-					<view class="desc ellipsis">{{item.name}}</view>
-					<view class="desc ellipsis c9">{{item.artist.name}}</view>
-				</view>
-			</scroll-view>
-		</view>
-		
+		<search ref="search" @close="closeSearch"></search>
 	</view>
 </template>
-
 <script>
 import { apiGetBanner, apiGetRecommendSongs, apiGetIndexData, apiGetTopAlbum, apiGetRelatedVideo, apiGetHotList } from '@/apis/index.js';
-import songList from '../../components/songList';
-
+import songList from '@/components/songList';
+import uniNavBar from '@/components/uni-nav-bar/uni-nav-bar.vue';
+import MescrollUni from '@/components/mescroll-uni/mescroll-uni.vue';
+import search from '@/components/search.vue';
 export default {
 	components: {
-		songList
+		uniNavBar,
+		MescrollUni,
+		songList,
+		search
 	},
 	data() {
 		return {
-			indicatorDots: true,
-			autoplay: true,
-			interval: 2000,
-			duration: 500,
-			circular: true,
-			// banner数据
+			searchTxt: '周杰伦',
+			isShowSearch: false,
+			// 下拉刷新的常用配置
+			downOption: {
+				auto: false //是否在初始化后,自动执行下拉回调callback; 默认true
+			},
+			// 上拉加载的常用配置
+			upOption: {
+				auto: false, // 是否在初始化完毕之后自动执行上拉加载的回调; 默认true
+				page: {
+					num: 0, // 当前页码,默认0,回调之前会加1,即callback(page)会从1开始
+					size: 10 // 每页数据的数量,默认10
+				},
+			},
 			swiper: [],
-			// 推荐数据
-			contentBar: [{ name: '每日推荐' }, { name: '歌单' }, { name: '排行榜' }, { name: '电台' }, { name: '直播' }],
 			curDate: '',
-			// 推荐2
+			contentBar: [{ name: '每日推荐' }, { name: '歌单' }, { name: '排行榜' }, { name: '电台' }, { name: '直播' }],
 			recommendSongs: [],
-			// 推荐3
+			newType: 1, // 新歌新碟
+			latestTempAlbum: [],
 			latestAlbum: [],
-			latestTempAlbum: [], // res返回的数据，0-3为新碟 3-6为新歌
-			newType: 1, // 1-更多新碟 2-更多新歌
-
+			relatedVideo: [],
+			hotList: []
 		};
 	},
 	onLoad() {
 		this.getBanner();
-		this.getRecommendSongs()
-		this.getLatestAlbum()
+		this.getRecommendSongs();
+		this.getLatestAlbum();
+		this.getRelatedVideo();
+		this.getHotList();
 
-		// 当前日期显示在第一个推荐上
 		this.curDate = new Date().getDate();
 	},
 	methods: {
 		// 获取轮播图
 		getBanner() {
 			apiGetBanner().then(res => {
-				this.swiper = res.banners
-			})
+				this.swiper = res.banners;
+			});
 		},
 		// 获取推荐歌单
 		getRecommendSongs() {
 			const params = {
 				limit: 6
-			}
+			};
 			apiGetRecommendSongs(params).then(res => {
 				// 格式化播放量数据
 				const formatCount = data => {
-					let tempNum = data
+					let tempNum = data;
 					if (data > 100000) {
-						tempNum = parseInt(data / 10000) + '万'
+						tempNum = parseInt(data / 10000) + '万';
 					}
 
-					return tempNum
+					return tempNum;
 				};
 
-				this.recommendSongs = res.result
+				this.recommendSongs = res.result;
 
 				this.recommendSongs.forEach(item => {
-					item.playCount = formatCount(item.playCount)
-				})
-			})
+					item.playCount = formatCount(item.playCount);
+				});
+			});
 		},
-		
-		// 获取新碟 type = 1
+		// 切换新碟新歌
+		switchTab(type) {
+			this.newType = type;
+			let temp = {
+				s: type == 1 ? 0 : 3,
+				e: type == 1 ? 3 : 6
+			};
+			this.latestAlbum = this.latestTempAlbum.slice(temp.s, temp.e);
+		},
+		// 获取新碟
 		getLatestAlbum() {
 			apiGetTopAlbum().then(res => {
-				this.latestTempAlbum = res.albums
-				this.latestAlbum = res.albums.slice(0, 3)
+				this.latestTempAlbum = res.albums;
+				this.latestAlbum = res.albums.slice(0, 3);
+			});
+		},
+		// 获取相关视频
+		getRelatedVideo() {
+			const params = {
+				id: 6524
+			};
+			apiGetRelatedVideo(params).then(res => {
+				this.relatedVideo = res.data;
+			});
+		},
+		// 获取相关视频
+		getList(pageNum, pageSize, successCallback, errorCallback) {
+			const params = {
+				id: 4571 + pageNum,
+				pageNum,
+				pageSize,
+			}
+			apiGetRelatedVideo(params).then(res => {
+				//联网成功的回调
+				successCallback && successCallback(res.data);
+			}, res => {
+				//联网失败的回调
+				errorCallback && errorCallback();
 			})
 		},
-		// 切换 新碟新歌
-		switchTab (type) {
-			if(type === this.newType) return
-		    this.newType = type
-		    // 根据类型加载不同数据
-		    if (type == 1) {
-		        // 新碟数据
-				// 模拟
-				this.latestAlbum = this.latestTempAlbum.slice(0, 3)
-		    }
-		    if (type == 2) {
-		        // 新歌数据
-				this.latestAlbum = this.latestTempAlbum.slice(3, 6)
-		    }
+		// hot 列表
+		getHotList() {
+			const params = {
+				limit: 10,
+				order: 'hot'
+			};
+			apiGetHotList(params).then(res => {
+				this.hotList = res.playlists;
+			});
 		},
+		// 跳转链接
+		goUrl(url) {
+			uni.navigateTo({
+				url: url
+			});
+		},
+		// 打开搜索
+		openSearch() {
+			this.isShowSearch = true;
+			this.$refs.search.open()
+		},
+		// 关闭搜索
+		closeSearch() {
+			this.isShowSearch = false;
+		},
+		/*下拉刷新的回调 */
+		downCallback(mescroll) {
+			mescroll.resetUpScroll(); // 重置列表为第一页 (自动执行 page.num=1, 再触发upCallback方法 )
+		},
+		/*上拉加载的回调: mescroll携带page的参数, 其中num:当前页 从1开始, size:每页数据条数,默认10 */
+		upCallback(mescroll) {
+			//联网加载数据
+			this.getList(mescroll.num, mescroll.size, (res) => {
+				//设置列表数据
+				if(mescroll.num == 1) this.relatedVideo = []; //如果是第一页需手动置空列表
+				
+				this.relatedVideo = this.relatedVideo.concat(res)
+				
+				// 后台接口有返回列表的总数据量 totalSize
+				// mescroll.endBySize(10, 50); //必传参数(当前页的数据个数, 总数据量)
+				mescroll.endSuccess();
+			}, () => {
+				//联网失败的回调,隐藏下拉刷新的状态
+				mescroll.endErr();
+			})
+		},
+		goCloud () {
+			uni.showToast({
+				icon: 'none',
+				title: '功能未开发',
+			});
+		}
+		
 	}
 };
 </script>
@@ -149,7 +276,43 @@ page {
 	color: #1a1a1a;
 	font-size: 24rpx;
 }
-
+.dpn{
+	display: none;
+}
+.top-img {
+	width: 50rpx;
+	height: 50rpx;
+	margin-top: 10rpx;
+}
+.top-search {
+	width: 560rpx;
+	/* #ifdef MP-WEIXIN */
+	width: 460rpx;
+	margin-left:-60rpx;
+	/* #endif */
+	height: 72rpx;
+	margin-right: 24rpx;
+	border-radius: 72rpx;
+	color: #c6c6c6;
+	background: #f7f7f7;
+	align-items: center;
+	justify-content: center;
+	.search-icon {
+		width: 28rpx;
+		height: 29rpx;
+		margin-right: 12rpx;
+	}
+}
+.page-content {
+	position: fixed;
+	top: 64px;
+	left: 0;
+	right: 0;
+	bottom: 0px;
+	/* #ifdef H5 || MP-WEIXIN */
+	top: 44px;
+	/* #endif */
+}
 .banner {
 	width: 100%;
 	height: 268rpx;
@@ -302,8 +465,7 @@ page {
 		transform: scale(0.8);
 	}
 }
-
-.video-list {
+.video-list { 
 	padding-left: 0;
 	.tit-bar {
 		padding-left: 32rpx;
@@ -332,8 +494,8 @@ page {
 }
 
 /*
-		 *平台差异化处理的代码可以放在底部，这样有利于集中管理
-		*/
+	 *平台差异化处理的代码可以放在底部，这样有利于集中管理
+	*/
 /* #ifdef MP-WEIXIN */
 .banner {
 	margin-top: 60rpx;
