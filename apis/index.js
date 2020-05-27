@@ -6,7 +6,6 @@ export function apiGetBanner(data) {
 		url: '/banner',
 		method: 'GET',
 		data,
-		authType: 'None'
 	})
 }
 // 获取推荐歌单
@@ -15,7 +14,6 @@ export function apiGetRecommendSongs(data) {
 		url: '/personalized',
 		method: 'GET',
 		data,
-		authType: 'None'
 	})
 }
 // 获取index
@@ -24,7 +22,6 @@ export function apiGetIndexData(data) {
 		url: '/aaIndex',
 		method: 'GET',
 		data,
-		authType: 'None'
 	})
 }
 // 获取新碟
@@ -33,7 +30,6 @@ export function apiGetTopAlbum(data) {
 		url: '/album/newest',
 		method: 'GET',
 		data,
-		authType: 'None'
 	})
 }
 
@@ -42,7 +38,7 @@ export function apiGetRelatedVideo(data) {
 		url: '/related/allvideo',
 		method: 'GET',
 		data,
-		authType: 'None'
+		hideLoading: true
 	})
 }
 
@@ -51,6 +47,59 @@ export function apiGetHotList(data) {
 		url: '/top/playlist',
 		method: 'GET',
 		data,
-		authType: 'None'
+	})
+}
+
+// 获取歌单详情
+export function apiAlbumDetail(data) {
+	return request.request({
+		url: '/playlist/detail',
+		method: 'GET',
+		data,
+	})
+}
+
+// 获取搜索
+export function apiSearch(data) {
+	return request.request({
+		url: '/search',
+		method: 'GET',
+		data,
+	})
+}
+
+// 获取排行榜
+export function apiToplist(data) {
+	return request.request({
+		url: '/toplist',
+		method: 'GET',
+		data,
+	})
+}
+
+// 获取排行榜
+export function apiTopSinglelist(data) {
+	return request.request({
+		url: '/top/list',
+		method: 'GET',
+		data,
+	})
+}
+
+// 获取歌曲链接
+export function apiSongUrl(data) {
+	return request.request({
+		url: '/song/url',
+		method: 'GET',
+		data,
+	})
+}
+
+// 获取歌曲详情
+export function apiSongDetail(data) {
+	return request.request({
+		url: '/song/detail',
+		method: 'GET',
+		data,
 	})
 }

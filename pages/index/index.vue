@@ -1,14 +1,25 @@
 <template>
 	<view>
 		<view :class="{dpn: isShowSearch}">
-			<uni-nav-bar fixed :status-bar="true" @clickLeft="goCloud" @clickRight="goCloud">
-				<block slot="left"><image class="top-img" src="/static/image/search/6.png"></image></block>
+			<uni-nav-bar fixed :status-bar="true" @clickRight="goPlay">
+				<block slot="left">
+					<block>
+						<!-- #ifdef MP-WEIXIN -->
+						<image class="top-img" src="/static/image/mine/r.png" @click="goPlay"></image>
+						<!-- #endif -->
+						<!-- #ifndef MP-WEIXIN -->
+						<image class="top-img pl10" src="/static/image/search/6.png" @click="goCloud"></image>
+						<!-- #endif -->
+					</block>
+				</block>
 				<view class="top-search flex-box" @click="openSearch">
 					<image class="search-icon" src="/static/image/search/2.png"></image>
 					{{ searchTxt }}
 				</view>
 				<!-- #ifdef APP-PLUS || H5 -->
-				<block slot="right"><image class="top-img" src="/static/image/mine/r.png"></image></block>
+				<block slot="right" v-if="isShowPlay">
+					<image class="top-img pr10" src="/static/image/mine/r.png"></image>
+				</block>
 				<!-- #endif -->
 			</uni-nav-bar>
 			<view class="page-content">
@@ -33,14 +44,14 @@
 					</view>
 					<!-- 主入口 -->
 					<view class="main-bar flex-box">
-						<view class="flex-item" v-for="(item, index) in contentBar" :key="index">
+						<view class="flex-item" v-for="(item, index) in contentBar" :key="index" @click="goUrl(item)">
 							<image :src="'/static/image/index/t_' + (index + 1) + '.png'" class="img"></image>
 							<view>{{ item.name }}</view>
 							<view v-if="index == 0" class="date">{{ curDate }}</view>
 						</view>
 					</view>
 					<!-- 歌单分类块 -->
-					<songList title="推荐歌单" link="/pages/songSquare/index?limit=30" :list="recommendSongs" />
+					<songList title="推荐歌单" :list="recommendSongs" />
 					<!-- 歌单分类块 -->
 					<view class="song-list">
 						<view class="tit-bar">
@@ -48,11 +59,11 @@
 							<view class="more fr">歌单广场</view>
 						</view>
 						<scroll-view class="scroll-view" scroll-x>
-							<view class="item" v-for="(item, index) in recommendSongs" :key="index">
+							<navigator class="item" v-for="(item, index) in recommendSongs" :key="index" hover-class="none" :url="'/pages/subpages/index/album?item='+ encodeURIComponent(JSON.stringify(item))">
 								<image class="img" :src="item.picUrl + $imgSuffix"></image>
 								<view class="desc ellipsis">{{ item.name }}</view>
 								<view class="count">{{ item.playCount }}</view>
-							</view>
+							</navigator>
 						</scroll-view>
 					</view>
 					<!-- 歌单分类块 -->
@@ -96,8 +107,9 @@
 	</view>
 </template>
 <script>
+import { mapState } from 'vuex';
 import { apiGetBanner, apiGetRecommendSongs, apiGetIndexData, apiGetTopAlbum, apiGetRelatedVideo, apiGetHotList } from '@/apis/index.js';
-import songList from '@/components/songList';
+import songList from '@/components/songList.vue';
 import uniNavBar from '@/components/uni-nav-bar/uni-nav-bar.vue';
 import MescrollUni from '@/components/mescroll-uni/mescroll-uni.vue';
 import search from '@/components/search.vue';
@@ -126,13 +138,14 @@ export default {
 			},
 			swiper: [],
 			curDate: '',
-			contentBar: [{ name: '每日推荐' }, { name: '歌单' }, { name: '排行榜' }, { name: '电台' }, { name: '直播' }],
+			contentBar: [{ name: '每日推荐' }, { name: '歌单' }, { name: '排行榜' , url: '/pages/subpages/index/rank'}, { name: '电台' }, { name: '直播' }],
 			recommendSongs: [],
 			newType: 1, // 新歌新碟
 			latestTempAlbum: [],
 			latestAlbum: [],
 			relatedVideo: [],
-			hotList: []
+			hotList: [],
+			isShowPlay: false
 		};
 	},
 	onLoad() {
@@ -143,6 +156,15 @@ export default {
 		this.getHotList();
 
 		this.curDate = new Date().getDate();
+		
+		// 公共设置图标
+		this.$pubFuc.setTabBarBadge(0)
+	},
+	onShow() {
+		this.isShowPlay = this.playList.list.length > 0
+	},
+	computed: {
+		...mapState(['playList'])
 	},
 	methods: {
 		// 获取轮播图
@@ -224,12 +246,6 @@ export default {
 				this.hotList = res.playlists;
 			});
 		},
-		// 跳转链接
-		goUrl(url) {
-			uni.navigateTo({
-				url: url
-			});
-		},
 		// 打开搜索
 		openSearch() {
 			this.isShowSearch = true;
@@ -265,8 +281,30 @@ export default {
 				icon: 'none',
 				title: '功能未开发',
 			});
+		},
+		// 链接跳转
+		goUrl(item) {
+			if (!item.url) {
+				this.goCloud()
+				return false;
+			}
+			uni.navigateTo({
+				url: item.url
+			})
+		},
+		// 去播放
+		goPlay () {
+			if (!this.playList.list.length) {
+				uni.showToast({
+					icon: 'none',
+					title: '播放列表还未有歌曲',
+				});
+				return
+			}
+			uni.navigateTo({
+				url: '/pages/subpages/index/play?go=1'
+			})
 		}
-		
 	}
 };
 </script>
@@ -275,6 +313,12 @@ export default {
 page {
 	color: #1a1a1a;
 	font-size: 24rpx;
+}
+.pl10{
+	padding-left: 20rpx;
+}
+.pr10{
+	padding-right:20rpx;
 }
 .dpn{
 	display: none;
@@ -287,6 +331,7 @@ page {
 .top-search {
 	width: 560rpx;
 	/* #ifdef MP-WEIXIN */
+	flex:none;
 	width: 460rpx;
 	margin-left:-60rpx;
 	/* #endif */
@@ -364,12 +409,12 @@ page {
 		position: relative;
 		.date {
 			position: absolute;
-			left: 60rpx;
+			left: 50%;
 			top: 40rpx;
 			line-height: 1;
 			font-size: 24rpx;
 			color: #ff392d;
-			transform: scale(0.8);
+			transform: translateX(-50%) scale(0.8);
 		}
 	}
 }
@@ -465,7 +510,7 @@ page {
 		transform: scale(0.8);
 	}
 }
-.video-list { 
+.video-list {
 	padding-left: 0;
 	.tit-bar {
 		padding-left: 32rpx;

@@ -43,7 +43,68 @@
 				"navigationBarTitleText": "账号" // 状态栏标题，覆盖掉 globalStyle 中设置的标题
 			}
 		}
-	],
+    ],
+	"subPackages": [
+	    {
+	      "root": "pages/subpages/index",
+	      "pages": [
+	        {
+	          "path": "album",
+	          "style": {
+	            "navigationBarTitleText": "歌单",
+	            "navigationStyle": "custom",
+	            "app-plus": {
+	              "titleNView": false
+	            }
+	          }
+	        },
+	        {
+	          "path": "searchList",
+	          "style": {
+	            "navigationBarTitleText": "搜索结果",
+	            "navigationStyle": "custom",
+	            "app-plus": {
+	              "titleNView": false
+	            }
+	          }
+	        },
+	        {
+	          "path": "rank",
+	          "style": {
+	            "navigationBarTitleText": "排行榜",
+	            "navigationStyle": "custom",
+	            "app-plus": {
+	              "titleNView": false
+	            }
+	          }
+	        },
+	        {
+	          "path": "play",
+	          "style": {
+	            "navigationBarTitleText": "播放",
+	            "navigationStyle": "custom",
+	            "app-plus": {
+	              "titleNView": false
+	            }
+	          }
+	        }
+	      ]
+	    },
+	    {
+	      "root": "pages/subpages/account",
+	      "pages": [
+	        {
+	          "path": "login",
+	          "style": {
+	            "navigationBarTitleText": "登录",
+	            "app-plus": {
+	              "titleNView": false
+	            }
+	          }
+	        }
+	      ]
+	    }
+	  ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black", // 导航栏标题颜色以及状态栏前景颜色，仅支持black/white
 		"navigationBarTitleText": "网易云音乐", // 导航栏标题文字内容
